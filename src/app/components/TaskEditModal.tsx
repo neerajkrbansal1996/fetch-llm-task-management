@@ -2,6 +2,11 @@
 
 import { Task, TaskStatus, Priority, UpdateTaskInput } from '@/types/task'
 import { useState, useEffect } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
+import Modal from './ui/Modal'
+import Input from './ui/Input'
+import Textarea from './ui/Textarea'
+import Button from './ui/Button'
 
 interface TaskEditModalProps {
   task: Task | null
@@ -36,8 +41,6 @@ export default function TaskEditModal({
     }
   }, [task])
 
-  if (!isOpen || !task) return null
-
   const handleSave = async () => {
     setLoading(true)
     try {
@@ -69,16 +72,25 @@ export default function TaskEditModal({
     }
   }
 
+  if (!isOpen || !task) return null
+
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl w-full max-w-2xl mx-4 max-h-[90vh] overflow-y-auto">
+    <>
+      <Modal isOpen={isOpen} onClose={onClose} size="md">
         <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700">
-          <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">
+          <motion.h2
+            className="text-xl font-semibold text-gray-900 dark:text-gray-100"
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.3 }}
+          >
             Edit Task
-          </h2>
-          <button
+          </motion.h2>
+          <motion.button
             onClick={onClose}
-            className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+            className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 p-1 rounded"
+            whileHover={{ scale: 1.1, rotate: 90 }}
+            whileTap={{ scale: 0.9 }}
           >
             <svg
               width="24"
@@ -95,130 +107,116 @@ export default function TaskEditModal({
                 strokeLinejoin="round"
               />
             </svg>
-          </button>
+          </motion.button>
         </div>
 
-        <div className="p-6 space-y-4">
-          <div>
-            <label
-              htmlFor="title"
-              className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
-            >
-              Title *
-            </label>
-            <input
-              id="title"
-              type="text"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100"
-              required
-            />
-          </div>
+        <motion.div
+          className="p-6 space-y-4"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.3, delay: 0.1 }}
+        >
+          <Input
+            id="title"
+            label="Title *"
+            type="text"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            required
+          />
 
-          <div>
-            <label
-              htmlFor="description"
-              className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
-            >
-              Description
-            </label>
-            <textarea
-              id="description"
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              rows={4}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100 resize-none"
-            />
-          </div>
+          <Textarea
+            id="description"
+            label="Description"
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            rows={4}
+          />
 
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label
                 htmlFor="status"
-                className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+                className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
               >
                 Status
               </label>
-              <select
+              <motion.select
                 id="status"
                 value={status}
                 onChange={(e) => setStatus(e.target.value as TaskStatus)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100"
+                className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+                whileFocus={{ scale: 1.01 }}
               >
                 <option value="todo">To Do</option>
                 <option value="in-progress">In Progress</option>
                 <option value="done">Done</option>
-              </select>
+              </motion.select>
             </div>
 
             <div>
               <label
                 htmlFor="priority"
-                className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+                className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
               >
                 Priority
               </label>
-              <select
+              <motion.select
                 id="priority"
                 value={priority}
                 onChange={(e) => setPriority(e.target.value as Priority)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100"
+                className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+                whileFocus={{ scale: 1.01 }}
               >
                 <option value="low">Low</option>
                 <option value="medium">Medium</option>
                 <option value="high">High</option>
-              </select>
+              </motion.select>
             </div>
           </div>
 
-          <div>
-            <label
-              htmlFor="assignee"
-              className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
-            >
-              Assignee
-            </label>
-            <input
-              id="assignee"
-              type="text"
-              value={assignee}
-              onChange={(e) => setAssignee(e.target.value)}
-              placeholder="Enter assignee name"
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100"
-            />
-          </div>
-        </div>
+          <Input
+            id="assignee"
+            label="Assignee"
+            type="text"
+            value={assignee}
+            onChange={(e) => setAssignee(e.target.value)}
+            placeholder="Enter assignee name"
+          />
+        </motion.div>
 
         <div className="flex items-center justify-between p-6 border-t border-gray-200 dark:border-gray-700">
-          <button
+          <Button
             onClick={() => setShowDeleteConfirm(true)}
             disabled={loading}
-            className="px-4 py-2 text-red-600 hover:text-red-700 font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+            variant="ghost"
+            className="text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300"
           >
             Delete Task
-          </button>
+          </Button>
           <div className="flex gap-3">
-            <button
-              onClick={onClose}
-              disabled={loading}
-              className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
-            >
+            <Button onClick={onClose} disabled={loading} variant="outline">
               Cancel
-            </button>
-            <button
+            </Button>
+            <Button
               onClick={handleSave}
               disabled={loading || !title.trim()}
-              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+              isLoading={loading}
             >
-              {loading ? 'Saving...' : 'Save Changes'}
-            </button>
+              Save Changes
+            </Button>
           </div>
         </div>
+      </Modal>
 
+      <AnimatePresence>
         {showDeleteConfirm && (
-          <div className="fixed inset-0 z-60 flex items-center justify-center bg-black bg-opacity-75">
-            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl p-6 max-w-md mx-4">
+          <Modal isOpen={showDeleteConfirm} onClose={() => setShowDeleteConfirm(false)} size="sm">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.9 }}
+            >
               <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">
                 Delete Task?
               </h3>
@@ -226,26 +224,27 @@ export default function TaskEditModal({
                 Are you sure you want to delete this task? This action cannot be undone.
               </p>
               <div className="flex gap-3 justify-end">
-                <button
+                <Button
                   onClick={() => setShowDeleteConfirm(false)}
                   disabled={loading}
-                  className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700 disabled:opacity-50"
+                  variant="outline"
                 >
                   Cancel
-                </button>
-                <button
+                </Button>
+                <Button
                   onClick={handleDelete}
                   disabled={loading}
-                  className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:opacity-50"
+                  variant="destructive"
+                  isLoading={loading}
                 >
-                  {loading ? 'Deleting...' : 'Delete'}
-                </button>
+                  Delete
+                </Button>
               </div>
-            </div>
-          </div>
+            </motion.div>
+          </Modal>
         )}
-      </div>
-    </div>
+      </AnimatePresence>
+    </>
   )
 }
 

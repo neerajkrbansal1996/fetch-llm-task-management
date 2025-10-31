@@ -1,20 +1,17 @@
 'use client'
 
 import { useState } from 'react'
-import TranscriptInput from './components/TranscriptInput'
+import { motion } from 'framer-motion'
 import KanbanBoard from './components/KanbanBoard'
 import TaskEditModal from './components/TaskEditModal'
+import AnimatedGrid from './components/ui/AnimatedGrid'
 import { useTasks } from '@/hooks/useTasks'
 import { Task } from '@/types/task'
 
 export default function Home() {
-  const { tasks, loading, fetchTasks, updateTaskStatus, updateTask, deleteTask } = useTasks()
+  const { tasks, loading, updateTaskStatus, updateTask, deleteTask } = useTasks()
   const [editingTask, setEditingTask] = useState<Task | null>(null)
   const [isModalOpen, setIsModalOpen] = useState(false)
-
-  const handleTasksCreated = () => {
-    fetchTasks()
-  }
 
   const handleTaskEdit = (task: Task) => {
     setEditingTask(task)
@@ -35,23 +32,25 @@ export default function Home() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-      <div className="container mx-auto px-4 py-8">
-        <header className="mb-8">
-          <h1 className="text-4xl font-bold text-gray-900 dark:text-gray-100 mb-2">
-            Fetch LLM
-          </h1>
-          <p className="text-gray-600 dark:text-gray-400">
-            Task Management Powered by AI
-          </p>
-        </header>
-
-        <TranscriptInput onTasksCreated={handleTasksCreated} />
-
-        <div className="mt-12">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 relative overflow-hidden">
+      <AnimatedGrid />
+      
+      <div className="relative z-10 container mx-auto px-4 py-8">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+        >
           {loading ? (
             <div className="flex items-center justify-center py-12">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+              <motion.div
+                className="relative"
+                animate={{ rotate: 360 }}
+                transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
+              >
+                <div className="w-12 h-12 border-4 border-blue-200 dark:border-blue-800 rounded-full"></div>
+                <div className="absolute top-0 left-0 w-12 h-12 border-4 border-transparent border-t-blue-600 dark:border-t-blue-400 rounded-full"></div>
+              </motion.div>
             </div>
           ) : (
             <KanbanBoard
@@ -61,7 +60,7 @@ export default function Home() {
               onTaskDelete={handleTaskDelete}
             />
           )}
-        </div>
+        </motion.div>
 
         <TaskEditModal
           task={editingTask}

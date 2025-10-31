@@ -20,7 +20,7 @@ export default function TranscriptInput({ onTasksCreated }: TranscriptInputProps
     e.preventDefault()
     
     if (!transcript.trim()) {
-      setError('Please enter a transcript')
+      setError('Please enter Fetch LLM project description or input')
       return
     }
 
@@ -43,7 +43,7 @@ export default function TranscriptInput({ onTasksCreated }: TranscriptInputProps
         throw new Error(data.error || 'Failed to process transcript')
       }
 
-      setSuccess(`Successfully extracted ${data.count} task${data.count !== 1 ? 's' : ''}!`)
+      setSuccess(`Successfully generated ${data.count} task${data.count !== 1 ? 's' : ''} for Fetch LLM project!`)
       setTranscript('')
       onTasksCreated()
     } catch (err) {
@@ -59,10 +59,9 @@ export default function TranscriptInput({ onTasksCreated }: TranscriptInputProps
         <form onSubmit={handleSubmit} className="space-y-6">
           <Textarea
             id="transcript"
-            label="Paste your meeting transcript below:"
             value={transcript}
             onChange={(e) => setTranscript(e.target.value)}
-            placeholder="Paste meeting transcript here..."
+            placeholder="e.g., meeting notes, feature requirements, bug reports, project updates, or any input related to Fetch LLM project..."
             className="h-64"
             disabled={loading}
             error={error || undefined}
@@ -101,7 +100,7 @@ export default function TranscriptInput({ onTasksCreated }: TranscriptInputProps
             className="w-full"
             size="lg"
           >
-            {loading ? 'Processing transcript...' : 'Extract Tasks'}
+            {loading ? 'Generating tasks...' : 'Generate Tasks'}
           </Button>
         </form>
       </Card>

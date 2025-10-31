@@ -16,37 +16,60 @@ export async function POST(request: NextRequest) {
 
     if (!transcript || typeof transcript !== 'string' || transcript.trim().length === 0) {
       return NextResponse.json(
-        { error: 'Transcript is required and must be a non-empty string' },
+        { error: 'Input is required and must be a non-empty string' },
         { status: 400 }
       )
     }
 
-    // Call Claude to extract tasks from transcript
-    const prompt = `You are a task extraction assistant. Analyze the following meeting transcript and extract all actionable tasks mentioned.
+    // Call Claude to generate tasks for Fetch LLM project
+    const prompt = `You are an intelligent project management assistant for the Fetch LLM project. Analyze the following input (which could be a project description, meeting notes, requirements, feature specifications, or any project-related information) and generate a comprehensive list of actionable tasks specifically for the Fetch LLM project.
+
+The Fetch LLM project is a task management application that uses AI (LLM) to extract and manage tasks. Keep this context in mind when generating tasks.
+
+Your goal is to break down the Fetch LLM project requirements into manageable, actionable tasks. Think about:
+- All the steps needed to complete the Fetch LLM project features or requirements
+- Dependencies between tasks
+- The logical sequence of work
+- Technical requirements and implementation details specific to Fetch LLM
+- LLM integration, API development, database design, UI/UX improvements
+- Documentation and testing needs for Fetch LLM
+- Deployment and release tasks
 
 For each task, provide:
-- title: A clear, concise task title
-- description: A brief description of what needs to be done
-- priority: "high", "medium", or "low" based on urgency and importance
-- assignee: The person assigned to the task if mentioned, otherwise null
+- title: A clear, concise task title that describes what needs to be done for Fetch LLM
+- description: A detailed description of what needs to be accomplished, including any relevant context or requirements specific to Fetch LLM
+- priority: "high" (critical/urgent), "medium" (important but not urgent), or "low" (nice to have) based on urgency, importance, and dependencies
+- assignee: The person assigned to the task if mentioned in the input, otherwise null
 
 Return ONLY a valid JSON array of task objects. Do not include any explanatory text, markdown, or code blocks. Example format:
 [
   {
-    "title": "Review pull request #123",
-    "description": "Need to review the changes in PR #123 before merging",
+    "title": "Set up Fetch LLM project repository and initial structure",
+    "description": "Create the Fetch LLM project repository, initialize with proper folder structure, set up version control, and configure development environment",
     "priority": "high",
-    "assignee": "John"
+    "assignee": null
   },
   {
-    "title": "Update documentation",
-    "description": "Update the API documentation with new endpoints",
+    "title": "Design database schema for Fetch LLM tasks",
+    "description": "Design and document the database schema including all tables, relationships, and indexes required for the Fetch LLM task management system",
+    "priority": "high",
+    "assignee": null
+  },
+  {
+    "title": "Implement LLM integration for task extraction",
+    "description": "Integrate LLM API (Claude/Anthropic) to extract tasks from project descriptions and meeting notes for Fetch LLM",
     "priority": "medium",
+    "assignee": null
+  },
+  {
+    "title": "Write API documentation for Fetch LLM",
+    "description": "Document all Fetch LLM API endpoints with request/response examples, authentication requirements, and error codes",
+    "priority": "low",
     "assignee": null
   }
 ]
 
-Transcript:
+Fetch LLM Project Input:
 ${transcript}`
 
     const message = await anthropic.messages.create({
@@ -115,7 +138,7 @@ ${transcript}`
       count: createdTasks.length,
     })
   } catch (error) {
-    console.error('Error processing transcript:', error)
+    console.error('Error processing input:', error)
     
     // Check if it's an Anthropic API error
     if (error instanceof APIError) {
@@ -139,7 +162,7 @@ ${transcript}`
     
     return NextResponse.json(
       {
-        error: 'Failed to process transcript',
+        error: 'Failed to process input and generate tasks',
         details: error instanceof Error ? error.message : 'Unknown error',
       },
       { status: 500 }
